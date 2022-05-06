@@ -109,7 +109,7 @@ class FileOps:
     @classmethod
     def upload(cls, src: str, dst: str, tar=False, clean=True) -> str:
         basename = os.path.basename(src)
-        dst = dst.rstrip(basename)
+        dst = re.sub(re.escape(basename) + "$", "", dst) # dst.rstrip(basename)
         if tar:
             src = cls._tar(src, f"{src.rstrip(os.path.sep)}.tar.gz")
 
@@ -215,7 +215,7 @@ class FileOps:
             todos = []
             for dfile in set(download_files):
                 dir_ = os.path.dirname(dfile)
-                uri = base_uri.rstrip("/") + "/" + dfile
+                uri = os.path.join(base_uri.rstrip("/"), dfile)
                 out_dir = os.path.join(base_out_dir, dir_)
                 todos.append(executor.submit(cls._download_s3,
                                              client, uri, out_dir))
